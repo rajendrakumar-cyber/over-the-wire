@@ -1,0 +1,117 @@
+Access granted. The password for natas9 is UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9
+Input secret:
+ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+ <html>
+<head>
+<!-- This stuff in the header has nothing to do with the level -->
+<link rel="stylesheet" type="text/css" href="http://natas.labs.overthewire.org/css/level.css">
+<link rel="stylesheet" href="http://natas.labs.overthewire.org/css/jquery-ui.css" />
+<link rel="stylesheet" href="http://natas.labs.overthewire.org/css/wechall.css" />
+<script src="http://natas.labs.overthewire.org/js/jquery-1.9.1.js"></script>
+<script src="http://natas.labs.overthewire.org/js/jquery-ui.js"></script>
+<script src=http://natas.labs.overthewire.org/js/wechall-data.js></script><script src="http://natas.labs.overthewire.org/js/wechall.js"></script>
+<script>var wechallinfo = { "level": "natas8", "pass": "<censored>" };</script></head>
+<body>
+<h1>natas8</h1>
+<div id="content">
+
+<?
+
+$encodedSecret = "3d3d516343746d4d6d6c315669563362";
+
+function encodeSecret($secret) {
+    return bin2hex(strrev(base64_encode($secret)));
+}
+
+if(array_key_exists("submit", $_POST)) {
+    if(encodeSecret($_POST['secret']) == $encodedSecret) {
+    print "Access granted. The password for natas9 is <censored>";
+    } else {
+    print "Wrong secret";
+    }
+}
+?>
+
+<form method=post>
+Input secret: <input name=secret><br>
+<input type=submit name=submit>
+</form>
+
+
+Natas Level 8: Source Code Review & Reverse Engineering
+What You See
+An "Input secret:" form
+A link to "View sourcecode"
+Step 1: View the Source Code
+The PHP source reveals:
+php
+<?php
+
+$encodedSecret = "3d3d516343746d4d6d6c315669563362";
+
+function encodeSecret($secret) {
+    return bin2hex(strrev(base64_encode($secret)));
+}
+
+if(array_key_exists("submit", $_POST)) {
+    if(encodeSecret($_POST['secret']) == $encodedSecret) {
+        print "Access granted. The password for natas9 is <censored>";
+    } else {
+        print "Wrong secret";
+    }
+}
+?>
+The Vulnerability
+The secret is hardcoded but encoded. You must reverse the encoding chain to find the original secret.
+The Encoding Chain (Forward)
+plain
+secret → base64_encode → strrev (reverse) → bin2hex
+Reverse the Chain
+plain
+hex → hex2bin → strrev → base64_decode = SECRET
+Your Python Verification
+Decode the secret:
+Python
+import base64
+
+hex_data = bytes.fromhex('3d3d516343746d4d6d6c315669563362')
+reversed_data = hex_data[::-1]
+secret = base64.b64decode(reversed_data)
+
+print(secret.decode())  # Output: oubWYf2kBq
+Verify by re-encoding:
+Python
+import base64
+
+secret = 'oubWYf2kBq'
+b64 = base64.b64encode(secret.encode('utf-8'))
+rev = b64[::-1]
+hex_val = rev.hex()
+
+print(hex_val)  # Output: 3d3d516343746d4d6d6c315669563362
+Decoding Walkthrough
+Table
+Step	Operation	Result
+1	Hex decode 3d3d516343746d4d6d6c315669563362	==QcCtmMml1ViV3b
+2	Reverse string	b3Vi1lmmMmtcQ==
+3	Base64 decode	oubWYf2kBq
+Password for Natas Level 9
+plain
+Sda6t0vkOPkM8YeOZkAGVhFoqlvlBKQj
+Key Takeaways
+Table
+Lesson	Explanation
+Encoding ≠ Encryption	Base64, hex, string reversal — all easily reversible
+Never hardcode secrets	Even encoded secrets can be extracted from source
+Security through obscurity fails	Hiding data with encoding chains doesn't protect it
+Always verify your decode	Re-encode to confirm you got the right answer
+Defense Tips
+Store secrets in environment variables or secure vaults (HashiCorp Vault, AWS Secrets Manager)
+Use proper hashing (bcrypt, Argon2) — not encoding
+If encryption is needed, use AES-256-GCM with keys stored separately
+
+
+
+

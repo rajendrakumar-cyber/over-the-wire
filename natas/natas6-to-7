@@ -1,0 +1,37 @@
+Natas Level 7: Local File Inclusion (LFI) / Path Traversal
+What You See
+A simple page with "Home" and "About" links
+URL structure: index.php?page=home
+The Vulnerability
+The page parameter in the URL is used to include a file on the server. This is a classic Local File Inclusion (LFI) vulnerability.
+When you click "Home", the URL becomes:
+plain
+index.php?page=home
+The server does something like:
+php
+<?php
+include($_GET['page'] . ".php");
+?>
+The Exploit: Path Traversal
+Since the server includes whatever file you specify, you can traverse the filesystem to read sensitive files.
+Target: The password file for the next level is stored at:
+plain
+/etc/natas_webpass/natas8
+Payload:
+plain
+http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8
+Why It Works
+The page parameter accepts any file path
+The server doesn't validate or sanitize the input
+The .php extension might be appended, but /etc/natas_webpass/natas8 is read as a valid path regardless
+The file contents are dumped directly into the page
+Password for Natas Level 8
+plain
+ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc
+Key Takeaways
+Table
+Lesson	Explanation
+Never trust user input in file paths	Always validate and whitelist allowed files
+Path traversal with ../ or absolute paths	Attackers can escape the intended directory
+Sensitive files in predictable locations	/etc/natas_webpass/natasX is a known target
+LFI can lead to RCE	In some cases, LFI can be escalated to Remote Code Execution

@@ -1,0 +1,45 @@
+Natas Level 6: Local File Inclusion (LFI)
+What You See
+A page with an "Input secret:" form field
+A link to "View sourcecode"
+Step 1: View the Source Code
+Clicking "View sourcecode" reveals PHP code similar to:
+php
+<?php
+include "includes/secret.inc";
+
+if(array_key_exists("secret", $_POST)) {
+    if($secret == $_POST['secret']) {
+        print "Access granted. The password for natas7 is <censored>";
+    } else {
+        print "Wrong secret";
+    }
+}
+?>
+The Vulnerability: include
+The line include "includes/secret.inc"; loads a file containing the secret value. But this file is not directly accessible via the browser.
+Step 2: Find the Secret
+The secret.inc file is stored on the server. You need to read it.
+Method: Access the file directly via URL
+Since the source tells us the file is at includes/secret.inc, try navigating to:
+plain
+http://natas6.natas.labs.overthewire.org/includes/secret.inc
+This reveals the secret value (e.g., something like FOEIUWGHFEEUHOFUOIW).
+Step 3: Submit the Secret
+Go back to the main page, enter the secret in the "Input secret:" field, and submit.
+Why This Works
+The include statement in PHP loads and executes the file server-side
+The .inc extension is not protected by the web server — it's served as plain text
+Developers often mistakenly assume files in includes/ folders are hidden
+Password for Natas Level 7
+plain
+B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0
+Key Takeaways
+Table
+Lesson	Explanation
+Always view source code	It reveals how the application works
+.inc files are dangerous	Web servers often don't block them; they can expose secrets
+include/require paths leak info	Knowing the file structure helps find hidden files
+Never store secrets in accessible files	Sensitive data should be in protected config files, not web-accessible directories
+Related Concept: Local File Inclusion (LFI)
+This is a mild form of LFI — where an attacker can read files on the server by manipulating file paths. In more severe cases, you can use ../ (directory traversal) to read system files like /etc/passwd
