@@ -1,0 +1,162 @@
+# OverTheWire: Bandit Walkthrough (Levels 0 - 13)
+
+This guide documents the solutions for the Bandit wargame from OverTheWire.
+
+## Level 0 → 1: The Basics
+* **Goal:** Read a file named `readme`.
+* **Concepts:** `ls`, `cat`.
+* **Commands:**
+```bash
+ls
+cat readme
+```
+
+## Level 1 → 2: Special Characters
+* **Goal:** Read a file named `-`.
+* **Concepts:** Relative paths to distinguish from stdin.
+* **Commands:**
+```bash
+cat ./-
+```
+
+## Level 2 → 3: Spaces in Filenames
+* **Goal:** Read a file with spaces in the name.
+* **Concepts:** Quotes and Escaping characters.
+* **Commands:**
+```bash
+cat "spaces in this filename"
+# OR
+cat spaces\ in\ this\ filename
+```
+
+## Level 3 → 4: Hidden Files
+* **Goal:** Find a hidden file in the `inhere` directory.
+* **Concepts:** `ls -a`.
+* **Commands:**
+```bash
+cd inhere
+ls -la
+cat .hidden_file_name
+```
+
+## Level 4 → 5: File Identification
+* **Goal:** Find the only human-readable file in a directory of binary noise.
+* **Concepts:** `file` command.
+* **Commands:**
+```bash
+file ./*
+cat ./-file07
+```
+
+## Level 5 → 6: Advanced Searching
+* **Goal:** Find a file with a specific size (1033 bytes) that is not executable.
+* **Concepts:** `find` command with flags.
+* **Commands:**
+```bash
+find inhere -type f -size 1033c ! -executable
+```
+
+## Level 6 → 7: System-Wide Search
+* **Goal:** Find a file owned by a specific user/group across the entire server.
+* **Concepts:** Global search and error suppression.
+* **Commands:**
+```bash
+find / -user bandit7 -group bandit6 -size 33c 2>/dev/null
+```
+
+## Level 7 → 8: Searching within Files
+* **Goal:** Find a password next to the word "millionth".
+* **Concepts:** `grep`.
+* **Commands:**
+```bash
+grep "millionth" data.txt
+```
+
+## Level 8 → 9: Unique Lines
+* **Goal:** Find the only line that occurs exactly once in a file.
+* **Concepts:** Piping, `sort`, and `uniq`.
+* **Commands:**
+```bash
+sort data.txt | uniq -u
+```
+
+## Level 9 → 10: Human Readable Strings
+* **Goal:** Find text inside a binary file.
+* **Concepts:** `strings`.
+* **Commands:**
+```bash
+strings data.txt | grep "=="
+```
+
+## Level 10 → 11: Base64 Decoding
+* **Goal:** Decode a Base64 encoded file.
+* **Concepts:** `base64`.
+* **Commands:**
+```bash
+base64 -d data.txt
+```
+
+## Level 11 → 12: Substitution Ciphers
+* **Goal:** Decrypt a ROT13 cipher.
+* **Concepts:** `tr` (translate).
+* **Commands:**
+```bash
+cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+```
+
+## Level 12 → 13: Decompression "Onion"
+* **Goal:** Extract a file that has been compressed multiple times.
+* **Concepts:** `xxd`, `gunzip`, `bzip2`, `tar`.
+* **Verified Password:** `FO5dwFsc0cbaIiH0h8J2eUks2vdTDwAn`
+* **Workflow:**
+1. `xxd -r data.txt > data` (Reverse hexdump)
+2. `file data` (Check type)
+3. Decompress based on type (gzip, bzip2, or tar).
+4. Repeat until "ASCII text" is reached.
+
+## Level 13 -> 14: SSH Key Authentication
+* **Goal:** Use a private SSH key to log in as bandit14 and read the password file.
+* **Concepts:** ssh -i, file permissions (chmod), /etc/bandit_pass/.
+* **Verified Password:** MU4VWeTyJk8ROof1qqmcBPaLh7lDCPvS
+* **Commands:**
+```bash
+ssh -i sshkey.private bandit14@localhost -p 2220
+cat /etc/bandit_pass/bandit14
+```
+
+## Level 14 -> 15: Submitting to a Port (Plaintext)
+* **Goal:** Submit the current password to port 30000 on localhost to receive the next password.
+* **Concepts:** 
+  * **Ports:** A digital door on a computer where services listen for connections.
+  * **Netcat (nc):** A command-line tool that can read and write data across network connections. It sends data in plaintext (unencrypted).
+  * **Piping (|):** Taking the output of one command (echo) and sending it as the input to another (nc).
+* **Verified Password:** 8xCjnmgoKbGLhHFAZlGE5Tmu4M2tKJQo
+* **Command:**
+```bash
+echo MU4VWeTyJk8ROof1qqmcBPaLh7lDCPvS | nc localhost 30000
+```
+
+## Level 16 -> 17: Port Scanning and SSL Discovery
+* **Goal:** Find an SSL-enabled port between 31000-32000 and submit the password.
+* **Concepts:** `nmap` (Port Scanning), `openssl s_client` (SSL Communication).
+* **Verified Port:** `31790` (Confirmed by scanning).
+* **Final Solution Commands:**
+    ```bash
+    # 1. Save and clean the key (all in one line, no breaks)
+    echo "kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx" | openssl s_client -connect localhost:31790 -quiet 2>/dev/null | tr -d '\r' | sed -n '/BEGIN RSA/,/END RSA/p' > /tmp/key17
+    
+    # 2. Secure the key
+    chmod 600 /tmp/key17
+    
+    # 3. Log in
+    ssh -i /tmp/key17 bandit17@localhost -p 2220
+    ```
+* **Transition to Level 17:**
+    1. Extract and Login (The "Fast" Way):
+       ```bash
+       K=/tmp/key_$(date +%s); echo "kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx" | openssl s_client -connect localhost:31790 -quiet 2>/dev/null | sed -n '/BEGIN RSA/,/END RSA/p' > $K && chmod 600 $K && ssh -i $K -o StrictHostKeyChecking=no -p 2220 bandit17@localhost
+       ```
+    2. Once logged in, get the password:
+       ```bash
+       cat /etc/bandit_pass/bandit17
+       ```
