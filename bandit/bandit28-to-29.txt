@@ -1,0 +1,98 @@
+┌──(white㉿white)-[~]
+└─$ git clone ssh://bandit28-git@bandit.labs.overthewire.org:2220/home/bandit28-git/repo 
+Cloning into 'repo'...
+                         _                     _ _ _   
+                        | |__   __ _ _ __   __| (_) |_ 
+                        | '_ \ / _` | '_ \ / _` | | __|
+                        | |_) | (_| | | | | (_| | | |_ 
+                        |_.__/ \__,_|_| |_|\__,_|_|\__|
+                                                       
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+bandit28-git@bandit.labs.overthewire.org's password: 
+remote: Enumerating objects: 9, done.
+remote: Counting objects: 100% (9/9), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 9 (delta 2), reused 0 (delta 0), pack-reused 0
+Receiving objects: 100% (9/9), done.
+Resolving deltas: 100% (2/2), done.
+                                                                            
+┌──(white㉿white)-[~]
+└─$ cd repo
+                                                                            
+┌──(white㉿white)-[~/repo]
+└─$ ls    
+README.md
+                                                                            
+┌──(white㉿white)-[~/repo]
+└─$ cd README.md
+cd: not a directory: README.md
+                                                                            
+┌──(white㉿white)-[~/repo]
+└─$ cat README.md
+# Bandit Notes
+Some notes for level29 of bandit.
+
+## credentials
+
+- username: bandit29
+- password: xxxxxxxxxx
+
+                                                                            
+┌──(white㉿white)-[~/repo]
+└─$ git log
+commit adc7f885a129baee883058b8a870739489f80194 (HEAD -> master, origin/master, origin/HEAD)
+Author: Morla Porla <morla@overthewire.org>
+Date:   Fri Apr 3 15:17:54 2026 +0000
+
+    fix info leak
+
+commit a3437bddd447f2d496731658e86b98cbea9d3c98
+Author: Morla Porla <morla@overthewire.org>
+Date:   Fri Apr 3 15:17:54 2026 +0000
+
+    add missing data
+
+commit cb630ec182b75bc289595511f8bcf4d47cfec50d
+Author: Ben Dover <noone@overthewire.org>
+Date:   Fri Apr 3 15:17:54 2026 +0000
+
+    initial commit of README.md
+                                                                            
+┌──(white㉿white)-[~/repo]
+└─$ git checkout  a3437bddd447f2d496731658e86b98cbea9d3c98
+Note: switching to 'a3437bddd447f2d496731658e86b98cbea9d3c98'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+HEAD is now at a3437bd add missing data
+                                                                            
+┌──(white㉿white)-[~/repo]
+└─$ cat README.md                                         
+# Bandit Notes
+Some notes for level29 of bandit.
+
+## credentials
+
+- username: bandit29
+- password: 4pT1t5DENaYuqnqvadYs1oE4QLCdjmJ7
+
+                                                                            
+┌──(white㉿white)-[~/repo]
+└─$ 

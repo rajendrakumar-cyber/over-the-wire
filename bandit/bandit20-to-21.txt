@@ -1,0 +1,35 @@
+bandit20@bandit:~$ ls
+suconnect
+bandit20@bandit:~$ cd suconnet
+-bash: cd: suconnet: No such file or directory
+bandit20@bandit:~$ cd suconnect
+-bash: cd: suconnect: Not a directory
+bandit20@bandit:~$ ls -ltr
+total 16
+-rwsr-x--- 1 bandit21 bandit20 15612 Apr  3 15:17 suconnect
+bandit20@bandit:~$ ./scconnect
+-bash: ./scconnect: No such file or directory
+bandit20@bandit:~$ ./sconnect
+-bash: ./sconnect: No such file or directory
+bandit20@bandit:~$ nc -lvp 9999
+Listening on 0.0.0.0 9999
+Connection received on localhost 36208
+bandit20@bandit:~$ nc -lvp 9999
+Listening on 0.0.0.0 9999
+Connection received on localhost 56664
+0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+EeoULMCra2q0dSkYj561DX7s1CpBuOBt
+bandit20@bandit:~$ exit
+logout
+Connection to bandit.labs.overthewire.org closed.
+ open in a another terminal
+bandit20@bandit:~$ ./suconnect
+Usage: ./suconnect <portnumber>
+This program will connect to the given port on localhost using TCP. If it receives the correct password from the other side, the next password is transmitted back.
+bandit20@bandit:~$ ./suconnect 9999
+Could not connect
+bandit20@bandit:~$ ./suconnect 9999
+Read: 0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+Password matches, sending next password
+bandit20@bandit:~$ 
+

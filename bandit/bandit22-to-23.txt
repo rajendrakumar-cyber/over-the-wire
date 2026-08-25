@@ -1,0 +1,37 @@
+ Enjoy your stay!
+
+bandit22@bandit:~$ 
+bandit22@bandit:~$ cd /etc/cron.d
+bandit22@bandit:/etc/cron.d$ ls
+behemoth4_cleanup  cronjob_bandit23  leviathan5_cleanup    sysstat
+clean_tmp          cronjob_bandit24  manpage3_resetpw_job
+cronjob_bandit22   e2scrub_all       otw-tmp-dir
+bandit22@bandit:/etc/cron.d$ cr
+criticalstat-bpfcc   cronjob_bandit23.sh  cryptdisks_stop
+cron                 crontab              cryptsetup
+cronjob_bandit22.sh  cryptdisks_start     
+bandit22@bandit:/etc/cron.d$ cronjob_bandit23
+cronjob_bandit23: command not found
+bandit22@bandit:/etc/cron.d$ cat cronjob_bandit23
+@reboot bandit23 /usr/bin/cronjob_bandit23.sh  &> /dev/null
+* * * * * bandit23 /usr/bin/cronjob_bandit23.sh  &> /dev/null
+bandit22@bandit:/etc/cron.d$ 
+bandit22@bandit:/etc/cron.d$ cat /usr/bin/cronjob_bandit23.sh
+#!/bin/bash
+
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)
+
+echo "Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget"
+
+cat /etc/bandit_pass/$myname > /tmp/$mytarget
+bandit22@bandit:/etc/cron.d$ echo I am user bandit23 | md5sum | cut -d ' ' -f 1
+8ca319486bfbbc3663ea0fbe81326349
+bandit22@bandit:/etc/cron.d$ cat /tmp/
+cat: /tmp/: Permission denied
+bandit22@bandit:/etc/cron.d$ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+0Zf11ioIjMVN551jX3CmStKLYqjk54Ga
+bandit22@bandit:/etc/cron.d$ exit
+logout
+Connection to bandit.labs.overthewire.org closed.
+                                                   
