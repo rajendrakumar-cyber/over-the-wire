@@ -1,0 +1,48 @@
+Line	What it does
+array_key_exists("username", $_REQUEST)	Checks if a username parameter was sent (GET or POST)
+mysqli_connect(...)	Connects to the local MySQL DB as user natas15
+mysqli_select_db(...)	Selects the natas15 database
+$query = "SELECT * from users where username=\"" . $_REQUEST["username"] . "\""	Builds the query by concatenating raw user input — this is the vulnerability
+mysqli_num_rows($res) > 0	If any row is returned → "exists", otherwise → "doesn't exist"
+
+The Vulnerability
+Your input is directly concatenated into the SQL string with no escaping or parameterization:
+
+SELECT * from users where username="YOUR_INPUT"
+
+You can close the quote and inject arbitrary SQL. For example, if you type:
+
+%%% natas16" AND password LIKE BINARY "%a%" " %%%5
+
+The final query becomes:
+
+SELECT * from users where username="natas16" AND password LIKE BINARY "%a%" "
+
+This asks: "Does the user natas16 exist AND does their password contain the letter 'a'?" 
+
+The app only answers yes ("This user exists") or no ("This user doesn't exist"). That's all the feedback you get — hence Blind SQL Injection. 
+
+
+<?php
+if(array_key_exists("username", $_REQUEST)) {
+    $link = mysqli_connect('localhost', 'natas14', '<censored>');
+    mysqli_select_db($link, 'natas14');
+
+    $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\"";
+    if(array_key_exists("debug", $_GET)) {
+        echo "Executing query: $query<br>";
+    }
+
+    if(mysqli_num_rows(mysqli_query($link, $query)) > 0) {
+            echo "Successful login! The password for natas15 is <censored><br>";
+    } else {
+            echo "Access denied!<br>";
+    }
+    mysqli_close($link);
+} else {
+?>
+
+<form action="index.php" method="POST">
+Username: <input name="username"><br>
+Password: <input name="password"><br>
+<input type="submit" value="Login"
